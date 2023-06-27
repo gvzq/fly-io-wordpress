@@ -1,26 +1,31 @@
-app = "fly-hello-wordpress"
+# fly.toml app configuration file generated for gerardo-wordpress-test on 2023-06-26T20:37:08-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "gerardo-wordpress-test"
+primary_region = "dfw"
 
 [env]
-WORDPRESS_CONFIG_EXTRA = "define(\"MYSQL_CLIENT_FLAGS\", MYSQLI_CLIENT_SSL);"
+  WORDPRESS_CONFIG_EXTRA = "define(\"MYSQL_CLIENT_FLAGS\", MYSQLI_CLIENT_SSL);"
 
 [[services]]
-# note: the default WordPress image listens on port 80, rather than the more common 8080:
-internal_port = 80
-protocol = "tcp"
+  protocol = "tcp"
+  internal_port = 80
 
-[services.concurrency]
-hard_limit = 50
-soft_limit = 25
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
 
-[[services.ports]]
-handlers = ["tls", "http"]
-port = 443
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+  [services.concurrency]
+    hard_limit = 50
+    soft_limit = 25
 
-[[services.ports]]
-handlers = ["http"]
-port = 80
-
-[[services.tcp_checks]]
-grace_period = "1s"
-interval = 5000
-timeout = 2000
+  [[services.tcp_checks]]
+    interval = "5s"
+    timeout = "2s"
+    grace_period = "1s"
+    restart_limit = 0
